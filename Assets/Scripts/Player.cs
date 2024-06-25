@@ -2,34 +2,92 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player2 : MonoBehaviour
 {
-    public Animation animPlayer;
-    public bool GameOver;
+    
+    public float moveH;
+    public int velocidade;
+    public int forcaPulo;
+    // O que vem aqui?
+    private Rigidbody2D rb;
+    private Animator anim;
+    private SpriteRenderer sprite;
+    public bool isJumping = false;
+    public bool comVida = true;
+    
+    
     // Start is called before the first frame update
     void Start()
     {
-       animPlayer = GetComponent<Animator>();    
+        rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        sprite = GetComponent<SpriteRenderer>();
+    }
+
+    private void FixedUpdate() 
+    {
+        //Andar
+        moveH = Input.GetAxis("Horizontal"); // -1 a 1
+        
+        transform.position += new Vector3(moveH * velocidade * Time.deltaTime, 0, 0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKey(KeyCode.W))
+        //Animação Andar
+        if(Input.GetKey(KeyCode.D) && moveH > 0)
         {
-            animPlayer.SetLayerWheight(2, 1);
+            sprite.flipX = false;
+            anim.SetLayerWeight(0,1);
+            //anim.SetLayerWeight(0,0);
+            
+            
         }
-        else 
+        
+        if(Input.GetKey(KeyCode.A) && moveH < 0)
         {
-            animPlayer.SetLayerWheight(2, 0);
+            sprite.flipX = true;
+            anim.SetLayerWeight(0,1);
+            //anim.SetLayerWeight(0,0);
         }
-        if (Input.GetKey(KeyCode.D))
+        
+        if(moveH == 0)
         {
-            animPlayer.SetLayerWheight(1, 1);
+            anim.SetLayerWeight(0,0);
+            //anim.SetLayerWeight(1,0);
+            
         }
-        else
+        
+
+        //Pular
+        if(Input.GetKeyDown(KeyCode.Space) && !isJumping)
         {
-            animPlayer.SetLayerWheight(1, 0);
+            rb.AddForce(transform.up * forcaPulo,ForceMode2D.Impulse);
+            isJumping = true;
+
         }
+        
     }
+
+    private void OnCollisionEnter2D(Collision2D other) 
+    {
+        if(other.gameObject.CompareTag("Chão"))
+        {
+            isJumping = false;
+        }
+        
+    }
+
+    private void OnTriggerEnter2D(Collider2D other) 
+    {
+        
+        if(other.gameObject.CompareTag("Morte"))
+        {
+            Destroy(this.gameObject); //Destroi o objeto que colidiu
+        }
+       
+    }
+
+    
 }
