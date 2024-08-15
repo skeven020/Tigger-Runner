@@ -1,34 +1,73 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player2 : MonoBehaviour
 {
+    
     public float moveH;
     public int velocidade;
     public int forcaPulo;
+    // O que vem aqui?
     private Rigidbody2D rb;
+    private Animator anim;
+    private SpriteRenderer sprite;
     public bool isJumping = false;
+    public bool comVida = true;
+    
+    
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        sprite = GetComponent<SpriteRenderer>();
+    }
+
+    private void FixedUpdate() 
+    {
+        //Andar
+        moveH = Input.GetAxis("Horizontal"); // -1 a 1
+        
+        transform.position += new Vector3(moveH * velocidade * Time.deltaTime, 0, 0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Andar
-         moveH = Input.GetAxis("Horizontal");
-         transform.position += new Vector3(moveH * velocidade * Time.deltaTime, 0, 0);
+        //Animação Andar
+        if(Input.GetKey(KeyCode.D) && moveH > 0)
+        {
+            sprite.flipX = false;
+            anim.SetLayerWeight(0,1);
+            //anim.SetLayerWeight(0,0);
+            
+            
+        }
+        
+        if(Input.GetKey(KeyCode.A) && moveH < 0)
+        {
+            sprite.flipX = true;
+            anim.SetLayerWeight(0,1);
+            //anim.SetLayerWeight(0,0);
+        }
+        
+        if(moveH == 0)
+        {
+            anim.SetLayerWeight(0,0);
+            //anim.SetLayerWeight(1,0);
+            
+        }
+        
 
-         //Pular
-         if(Input.GetKeyDown(KeyCode.Space) && !isJumping)
-         {
+        //Pular
+        if(Input.GetKeyDown(KeyCode.Space) && !isJumping)
+        {
             rb.AddForce(transform.up * forcaPulo,ForceMode2D.Impulse);
-         }
+            isJumping = true;
 
+        }
+        
     }
 
     private void OnCollisionEnter2D(Collision2D other) 
@@ -37,5 +76,24 @@ public class Player : MonoBehaviour
         {
             isJumping = false;
         }
+        
     }
-} 
+
+    private void OnTriggerEnter2D(Collider2D other) 
+    {
+        
+        if(other.gameObject.CompareTag("Morte"))
+        {
+            Destroy(this.gameObject); //Destroi o objeto que colidiu
+        }
+        if(other.gameObject.CompareTag("Money"))
+        {
+            Destroy(other.gameObject);
+        }
+        if(other.gameObject.CompareTag(""))
+        {
+            Destroy(other.gameObject);
+        }
+       
+    }
+}
