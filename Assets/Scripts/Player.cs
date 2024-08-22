@@ -90,10 +90,6 @@ public class Player2 : MonoBehaviour
         {
             Destroy(other.gameObject);
         }
-        if(other.gameObject.CompareTag(""))
-        {
-            Destroy(other.gameObject);
-        }
        
     }
 }
